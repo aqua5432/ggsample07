@@ -32,9 +32,16 @@ void main(void)
   float rd = dot(nn, nl);
   float rs = dot(nr, nv);
 
+  vec3 nt = normalize(t);                           // 接線ベクトル
+  
+  // Kajiya-Kay モデルによる陰影付け
+  float lt = dot(nl, nt);
+  float cos_i = sqrt(1.0 - lt * lt);
+  float vt = dot(nv, nt);
+
   vec4 iamb = kamb * lamb;
-  vec4 idiff = max(rd, 0.0) * kdiff * ldiff;
-  vec4 ispec = pow(max(rs, 0.0), kshi) * kspec * lspec;
+  vec4 idiff = cos_i * kdiff * ldiff;
+  vec4 ispec = pow(max(cos_i * sqrt(1.0 - vt * vt) - lt * vt, 0.0), kshi) * kspec * lspec;
 
   fc = iamb + idiff + ispec;
 }
